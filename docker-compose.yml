@@ -1,0 +1,73 @@
+version: '3.7'
+
+services:
+  hierarchy-api:
+    build:
+      context: .
+    image: personio/hierachy:latest
+    ports:
+      - '8080:8080'
+    environment:
+      POSTGRES_HOST: postgres
+      KEYCLOAK_HOST: keycloak
+      KEYCLOAK_PORT: 8080
+      KEYCLOAK_SWAGGER_URL: http://localhost:28080
+    depends_on:
+      - postgres
+    networks:
+      - hierarchy-keycloak
+      - hierarchy-postgres
+
+  postgres:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+    networks:
+      - hierarchy-postgres
+
+  postgres-keycloak:
+    image: postgres
+    restart: unless-stopped
+    volumes:
+      - ./volume/pg:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: POSTGRESQL_DB
+      POSTGRES_USER: POSTGRES_USER
+      POSTGRES_PASSWORD: POSTGRES_PASSWORD
+    ports:
+      - "5433:5432"
+    networks:
+      - keycloak-postgres
+
+  keycloak:
+    image: jboss/keycloak:16.1.1
+    restart: unless-stopped
+    volumes:
+      - ./keycloak-init/realm-export.json:/keycloak-init/realm-export.json
+      - ./volume/keycloak/:/opt/jboss/keycloak/standalone/data/
+    depends_on:
+      - postgres-keycloak
+    environment:
+      KEYCLOAK_USER: KEYCLOAK_USER
+      KEYCLOAK_PASSWORD: KEYCLOAK_PASSWORD
+      DB_VENDOR: postgres
+      DB_ADDR: postgres-keycloak
+      DB_DATABASE: POSTGRESQL_DB
+      DB_USER: POSTGRES_USER
+      DB_PASSWORD: POSTGRES_PASSWORD
+      KEYCLOAK_IMPORT: /keycloak-init/realm-export.json
+      keycloak.profile.feature.upload_scripts: enabled
+    ports:
+      - "28080:8080"
+    networks:
+      - keycloak-postgres
+      - hierarchy-keycloak
+
+networks:
+  keycloak-postgres:
+  hierarchy-keycloak:
+  hierarchy-postgres:

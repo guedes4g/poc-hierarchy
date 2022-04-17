@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="i508889 (generated)" id="1649976267355-1">
+        <createTable tableName="hierarchy">
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="root" type="BOOL"/>
+            <column name="supervisor_name" type="VARCHAR(255)"/>
+            <column name="supervisor_user_id" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="i508889 (generated)" id="1649976267355-2">
+        <addPrimaryKey columnNames="name, user_id" constraintName="hierarchy_pkey" tableName="hierarchy"/>
+    </changeSet>
+    <changeSet author="i508889 (generated)" id="1649976267355-3">
+        <createIndex indexName="hierarchy_user_id_idx" tableName="hierarchy">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="i508889 (generated)" id="1649976267355-4">
+        <createIndex indexName="hierarchy_user_id_root_idx" tableName="hierarchy">
+            <column name="user_id"/>
+            <column name="root"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="i508889 (generated)" id="1649976267355-5">
+        <addForeignKeyConstraint baseColumnNames="supervisor_name,supervisor_user_id" baseTableName="hierarchy"
+                                 constraintName="fk5ej5spv1oa5kjhexi8fwn0qvd" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="name,user_id" referencedTableName="hierarchy"/>
+    </changeSet>
+</databaseChangeLog>
